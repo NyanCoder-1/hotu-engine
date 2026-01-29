@@ -1,0 +1,7 @@
+# generated files
+/src/platform-linux/xdg-shell.h
+/src/platform-linux/xdg-shell.c
+
+# ignore build and IDE artifacts
+/build/
+/.cache/
