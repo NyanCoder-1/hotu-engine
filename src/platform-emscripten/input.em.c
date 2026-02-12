@@ -5,7 +5,7 @@
 #include <string.h>
 
 typedef struct EmKeyMapPair {
-	const char* key;
+	const char *key;
 	uint32_t value;
 } EmKeyMapPair;
 
@@ -32,7 +32,7 @@ void emInputDelete(EmInput_t *input) {
 	free(*input);
 	*input = 0;
 }
-uint32_t emInputParseKey(EmInput_t self, const char* key) {
+uint32_t emInputParseKey(EmInput_t self, const char *key) {
 	if (!self) return 0;
 	EmKeyMapPair *pair = shgetp(self->map, key);
 	return pair ? pair->value : KB_NONE;

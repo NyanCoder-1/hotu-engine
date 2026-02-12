@@ -3,8 +3,11 @@
 #include "scene-manager.h"
 #include <GLES3/gl3.h>
 #include <stdio.h>
+
 #define STB_DS_IMPLEMENTATION
 #include "stb_ds.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 void coreInternalCtor(CoreInternal_t self) {
 	clock_gettime(CLOCK_MONOTONIC, &self->timePrev);
@@ -43,13 +46,13 @@ void coreInternalOnMouseMove(CoreInternal_t self, double x, double y) {
 Scene_t coreGetCurrentScene(Core_t self) {
 	return coreGetInternal(self)->currentScene;
 }
-void coreAddScene(Core_t self, Scene_t scene, const char* name) {
+void coreAddScene(Core_t self, Scene_t scene, const char *name) {
 	sceneManagerAddScene(coreGetInternal(self)->sceneManager, scene, name);
 }
-void coreRemoveScene(Core_t self, const char* name) {
+void coreRemoveScene(Core_t self, const char *name) {
 	sceneManagerRemoveScene(coreGetInternal(self)->sceneManager, name);
 }
-void coreSetCurrentScene(Core_t self, const char* name) {
+void coreSetCurrentScene(Core_t self, const char *name) {
 	CoreInternal_t internal = coreGetInternal(self);
 	Scene_t scene = sceneManagerGetSceneByName(internal->sceneManager, name);
 	if (scene) {

@@ -1,12 +1,10 @@
 #include "scene.h"
-#include "model.h"
-#include "view.h"
+#include "scene-renderer.h"
 #include <stdlib.h>
 #include <string.h>
 
 typedef struct Scene {
-	Model_t model;
-	View_t view;
+	SceneRenderer_t renderer;
 } Scene;
 
 Scene_t sceneNew() {
@@ -14,8 +12,7 @@ Scene_t sceneNew() {
 	if (!scene) return 0;
 
 	memset(scene, 0, sizeof(Scene));
-	scene->model = modelNew();
-	scene->view = viewNew(scene->model);
+	scene->renderer = sceneRendererNew(scene);
 
 	return scene;
 }
@@ -28,6 +25,6 @@ void sceneDelete(Scene_t *scene) {
 }
 void sceneUpdate(Scene_t self, double deltaTime) {
 	(void)deltaTime;
-	viewRender(self->view);
+	sceneRendererFrame(self->renderer);
 }
 

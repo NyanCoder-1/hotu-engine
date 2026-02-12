@@ -365,7 +365,7 @@ static void registry_global(void *data, struct wl_registry *registry, uint32_t n
 		core->shell = (struct xdg_wm_base*)wl_registry_bind(registry, name, &xdg_wm_base_interface, 1);
 	}
 	else if (strcmp(interface, wl_seat_interface.name) == 0) {
-		core->seat = wl_registry_bind(registry, name, &wl_seat_interface, 1);
+		core->seat = (struct wl_seat*)wl_registry_bind(registry, name, &wl_seat_interface, 1);
 	}
 };
 static void shell_ping(void *data, struct xdg_wm_base *shell, uint32_t serial) {
@@ -421,7 +421,7 @@ static void kb_keymap(void *data, struct wl_keyboard *kb, uint32_t format, int32
 		fprintf(stderr, "Error [keyboard]: wrong keymap format\n");
 		return;
 	}
-	char *map_shm = mmap(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
+	char *map_shm = (char*)mmap(0, size, PROT_READ, MAP_PRIVATE, fd, 0);
 	if (map_shm == MAP_FAILED) {
 		core->noKeymap |= true;
 		fprintf(stderr, "Error [keyboard]: no keymap\n");

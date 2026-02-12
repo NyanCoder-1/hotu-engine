@@ -18,5 +18,4 @@ void inputListenerMouseDown(InputListener_t listener, uint32_t button, double x,
 void inputListenerMouseUp(InputListener_t listener, uint32_t button, double x, double y);
 void inputListenerMouseMove(InputListener_t listener, double x, double y);
 
-
 #endif

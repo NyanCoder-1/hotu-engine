@@ -2,7 +2,7 @@
 #include "stb_ds.h"
 
 typedef struct {
-	char* key;
+	char *key;
 	Scene_t value;
 } ScenesPair;
 typedef struct SceneManager {
@@ -21,12 +21,12 @@ void sceneManagerDelete(SceneManager_t *sceneManager) {
 	free(*sceneManager);
 	*sceneManager = 0;
 }
-void sceneManagerAddScene(SceneManager_t self, Scene_t scene, const char* name) {
+void sceneManagerAddScene(SceneManager_t self, Scene_t scene, const char *name) {
 	shput(self->scenes, name, scene);
 }
-void sceneManagerRemoveScene(SceneManager_t self, const char* name) {
+void sceneManagerRemoveScene(SceneManager_t self, const char *name) {
 	shdel(self->scenes, name);
 }
-Scene_t sceneManagerGetSceneByName(SceneManager_t self, const char* name) {
+Scene_t sceneManagerGetSceneByName(SceneManager_t self, const char *name) {
 	return shget(self->scenes, name);
 }

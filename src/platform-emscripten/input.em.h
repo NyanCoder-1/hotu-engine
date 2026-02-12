@@ -7,7 +7,7 @@ typedef struct EmInput *EmInput_t;
 
 EmInput_t emInputNew();
 void emInputDelete(EmInput_t *input);
-uint32_t emInputParseKey(EmInput_t self, const char* key);
+uint32_t emInputParseKey(EmInput_t self, const char *key);
 
 #endif
 

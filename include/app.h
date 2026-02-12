@@ -10,4 +10,3 @@ void appClose(App_t app);
 void appUpdate(App_t app, double deltaTime);
 
 #endif
-
