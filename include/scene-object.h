@@ -1,9 +1,28 @@
 #ifndef __SCENE_OBJECTS_H__
 #define __SCENE_OBJECTS_H__
 
-typedef struct SceneObject *SceneObject_t;
+#include "utility/math.types.h"
+#include <stdint.h>
 
-SceneObject_t sceneObjectNew();
-void sceneObjectDelete(SceneObject_t *model);
+typedef struct SceneObject {
+	Vector3f position;
+	Quaternion rotation;
+
+	uint32_t meshId;
+	uint32_t materialId;
+	uint8_t visible : 1;
+	uint8_t transclucent : 1;
+} SceneObject, *SceneObject_t;
+
+typedef struct SceneUIElement {
+	Vector2f position;
+	Vector2f size;
+	ColorRGBA color;
+	ColorRGBA backgroundColor;
+	uint32_t meshId;
+	uint32_t materialId;
+	char *text;
+	uint8_t visible : 1;
+} SceneUIElement, *SceneUIElement_t;
 
 #endif
