@@ -31,7 +31,7 @@ Shader shaderCreateFromFile(const char *vertexFilename, const char *fragmentFile
 }
 void shaderCreateFromSourceInplace(Shader_t shader, const char *vertexShaderSource, const char *fragmentShaderSource) {
 	if (!shader || !vertexShaderSource || !fragmentShaderSource) {
-		fprintf(stdout, "Error in %s: Invalid argument\n", __func__);
+		fprintf(stdout, "Error in `%s`: Invalid argument\n", __func__);
 		return;
 	}
 
@@ -61,19 +61,19 @@ void shaderCreateFromSourceInplace(Shader_t shader, const char *vertexShaderSour
 }
 void shaderCreateFromFileInplace(Shader_t shader, const char *vertexFilename, const char *fragmentFilename) {
 	if (!shader || !vertexFilename || !fragmentFilename) {
-		fprintf(stdout, "Error in %s: Invalid argument\n", __func__);
+		fprintf(stdout, "Error in `%s`: Invalid argument\n", __func__);
 		return;
 	}
 	uint8_t *assetVertexShaderSource = loadAssetBinary(vertexFilename);
 	uint8_t *assetFragmentShaderSource = loadAssetBinary(fragmentFilename);
 	if (!assetVertexShaderSource || !assetFragmentShaderSource) {
-		fprintf(stdout, "Error in %s: Failed to load asset binary\n", __func__);
+		fprintf(stdout, "Error in `%s`: Failed to load asset binary\n", __func__);
 		return;
 	}
 	size_t sizeVertex  = assetGetSize(assetVertexShaderSource);
 	size_t sizeFragment = assetGetSize(assetFragmentShaderSource);
 	if (sizeVertex == 0 || sizeFragment == 0) {
-		fprintf(stdout, "Error in %s: Empty file\n", __func__);
+		fprintf(stdout, "Error in `%s`: Empty file\n", __func__);
 		freeAssetBinary(assetVertexShaderSource);
 		freeAssetBinary(assetFragmentShaderSource);
 		return;

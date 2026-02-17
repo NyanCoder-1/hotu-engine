@@ -2,8 +2,8 @@
 #define __CORE_COMMON_H__
 
 #include "app.h"
-#include "scene.h"
-#include "scene-manager.h"
+#include "scene/scene.h"
+#include "scene/scene-manager.h"
 #include <stdint.h>
 #if !defined(_POSIX_C_SOURCE) || _POSIX_C_SOURCE < 199309L
 #define _POSIX_C_SOURCE 199309L
