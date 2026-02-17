@@ -1,6 +1,6 @@
 #include "core.h"
 #include "core.internal.h"
-#include "scene-manager.h"
+#include "scene/scene-manager.h"
 #include <GLES3/gl3.h>
 #include <stdio.h>
 

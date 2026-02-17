@@ -1,4 +1,4 @@
-#include "scene-manager.h"
+#include "scene/scene-manager.h"
 #include "stb_ds.h"
 
 typedef struct {

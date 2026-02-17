@@ -3,7 +3,7 @@
 
 #include "app.h"
 #include "core.type.h"
-#include "scene.h"
+#include "scene/scene.h"
 
 Core_t coreNew();
 void coreDelete(Core_t *self);

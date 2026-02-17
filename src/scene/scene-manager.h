@@ -1,7 +1,7 @@
-#ifndef __SCENEMANAGER_H__
-#define __SCENEMANAGER_H__
+#ifndef __SCENE_SCENEMANAGER_H__
+#define __SCENE_SCENEMANAGER_H__
 
-#include "scene.h"
+#include "scene/scene.h"
 
 typedef struct SceneManager *SceneManager_t;
 
