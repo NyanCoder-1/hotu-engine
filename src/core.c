@@ -1,5 +1,6 @@
 #include "core.h"
 #include "core.internal.h"
+#include "core.type.h"
 #include "scene/scene-manager.h"
 #include <GLES3/gl3.h>
 #include <stdio.h>
@@ -43,6 +44,9 @@ void coreInternalOnMouseUp(CoreInternal_t self, uint32_t button, double x, doubl
 void coreInternalOnMouseMove(CoreInternal_t self, double x, double y) {
 }
 
+Vector2i coreGetScreenSize(const Core_t self) {
+	return (Vector2i){ coreGetInternal(self)->width, coreGetInternal(self)->height };
+}
 Scene_t coreGetCurrentScene(Core_t self) {
 	return coreGetInternal(self)->currentScene;
 }

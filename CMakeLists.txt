@@ -24,7 +24,8 @@ list(FILTER HEADERS EXCLUDE REGEX "/platform-.*/")
 set(INCLUDE_DIR
 	"${SOURCE_DIR}/"
 	"${HEADERS_DIR}/"
-	"${SUBMODULES_DIR}/stb")
+	"${SUBMODULES_DIR}/stb"
+	"${SUBMODULES_DIR}/cglm/include")
 set(EXTERNAL_LIBRARIES)
 
 if (${CMAKE_SYSTEM_NAME} MATCHES "Emscripten")

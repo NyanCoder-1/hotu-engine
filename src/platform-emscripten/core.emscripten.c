@@ -37,6 +37,14 @@ Core_t coreNew() {
 	coreInitGLContext(core);
 	coreInternalCtor(&core->internal);
 
+	// Init size
+	int width, height;
+	emscripten_get_canvas_element_size("!canvas", &width, &height);
+	if ((width > 0) && (height > 0)) {
+		glViewport(0, 0, width, height);
+		coreInternalOnResize(&core->internal, width, height);
+	}
+
 	return core;
 }
 void coreDelete(Core_t *self) {

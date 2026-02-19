@@ -1,4 +1,7 @@
 #include "scene/scene-renderer.h"
+#include "cglm/mat4.h"
+#include "cglm/quat.h"
+#include "render/camera.h"
 #include "render/material.h"
 #include "render/mesh.h"
 #include "render/shader.h"
@@ -69,7 +72,10 @@ void sceneRendererDelete(SceneRenderer_t *renderer) {
 }
 void sceneRendererFrame(SceneRenderer_t self) {
 	glClearColor(self->bgColor.r, self->bgColor.g, self->bgColor.b, self->bgColor.a);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	Camera camera = sceneGetCamera(self->scene);
+	Matrix4x4 matrixViewProjection = cameraGetViewProjectionMatrix(&camera, sceneGetCore(self->scene));
 
 	size_t objectsCount = sceneGetObjectsCount(self->scene);
 	SceneObject_t objects = sceneGetObjectArray(self->scene);
@@ -78,7 +84,19 @@ void sceneRendererFrame(SceneRenderer_t self) {
 		SceneObject_t currentObject = &objects[i];
 		if (!currentObject->visible || currentObject->transclucent) continue;
 
+		mat4 rotation = GLM_MAT4_IDENTITY_INIT;
+		glm_quat_mat4((float*)&currentObject->rotation, rotation);
+		mat4 translation = GLM_MAT4_IDENTITY_INIT;
+		glm_translate(translation, (float*)&currentObject->position);
+		mat4 matrixModel = GLM_MAT4_IDENTITY_INIT;
+		glm_mat4_mul(translation, rotation, matrixModel);
+		mat4 matrixModelViewProjection = GLM_MAT4_IDENTITY_INIT;
+		glm_mat4_mul((vec4*)matrixViewProjection.mAlt, matrixModel, matrixModelViewProjection);
+
 		materialBind(&self->materials[currentObject->materialId], self->shaders, self->textures);
+		Shader_t currentShader = &self->shaders[self->materials[currentObject->materialId].shaderId];
+		glUniformMatrix4fv(currentShader->uniformLocations[SHADER_UNIFORM_LOCATION_MATRIX_MODEL], 1, GL_TRUE, (float*)matrixModel);
+		glUniformMatrix4fv(currentShader->uniformLocations[SHADER_UNIFORM_LOCATION_MATRIX_MODELVIEWPROJECTION], 1, GL_TRUE, (float*)&matrixModelViewProjection);
 		meshRender(&self->meshes[currentObject->meshId]);
 	}
 	// transparent objects pass
@@ -86,7 +104,19 @@ void sceneRendererFrame(SceneRenderer_t self) {
 		SceneObject_t currentObject = &objects[i];
 		if (!currentObject->visible || !currentObject->transclucent) continue;
 
+		mat4 rotation = GLM_MAT4_IDENTITY_INIT;
+		glm_quat_mat4t((float*)&currentObject->rotation, rotation);
+		mat4 translation = GLM_MAT4_IDENTITY_INIT;
+		glm_translate(translation, (float*)&currentObject->position);
+		mat4 matrixModel = GLM_MAT4_IDENTITY_INIT;
+		glm_mat4_mul(rotation, translation, matrixModel);
+		mat4 matrixModelViewProjection = GLM_MAT4_IDENTITY_INIT;
+		glm_mat4_mul((vec4*)matrixViewProjection.mAlt, matrixModel, matrixModelViewProjection);
+
 		materialBind(&self->materials[currentObject->materialId], self->shaders, self->textures);
+		Shader_t currentShader = &self->shaders[self->materials[currentObject->materialId].shaderId];
+		glUniformMatrix4fv(currentShader->uniformLocations[SHADER_UNIFORM_LOCATION_MATRIX_MODEL], 1, GL_TRUE, (float*)matrixModel);
+		glUniformMatrix4fv(currentShader->uniformLocations[SHADER_UNIFORM_LOCATION_MATRIX_MODELVIEWPROJECTION], 1, GL_TRUE, (float*)&matrixModelViewProjection);
 		meshRender(&self->meshes[currentObject->meshId]);
 	}
 }
@@ -150,12 +180,12 @@ Texture_t sceneRendererGetTextureByName(SceneRenderer_t self, const char *name) 
 
 
 typedef struct Vertex {
-	Vector2f position;
+	Vector3f position;
 	Vector2f uv;
 	ColorRGBAf color;
 } Vertex;
 static const MeshVertexAttributeDescription vertexAttributes[] = {
-	(MeshVertexAttributeDescription){ .location = SHADER_ATTRIBUTE_LOCATION_POSITION, 2, (const void*)offsetof(Vertex, position) },
+	(MeshVertexAttributeDescription){ .location = SHADER_ATTRIBUTE_LOCATION_POSITION, 3, (const void*)offsetof(Vertex, position) },
 	(MeshVertexAttributeDescription){ .location = SHADER_ATTRIBUTE_LOCATION_TEXTURECOORDINATES, 2, (const void*)offsetof(Vertex, uv) },
 	(MeshVertexAttributeDescription){ .location = SHADER_ATTRIBUTE_LOCATION_COLOR, 4, (const void*)offsetof(Vertex, color) },
 };
@@ -165,21 +195,33 @@ static const MeshVertexDescription vertexDescription = {
 	.attributesCount = sizeof(vertexAttributes) / sizeof(MeshVertexAttributeDescription)
 };
 static const Vertex triangleVertices[] = {
-	{ .position = { -1.0f, -1.0f }, .uv = {0.0f, 1.0f}, .color = { 1.0f, 0.0f, 0.0f, 1.0f } },
-	{ .position = { 0.0f, 1.0f }, .uv = {0.5f, 0.0f}, .color = { 0.0f, 1.0f, 0.0f, 1.0f } },
-	{ .position = { 1.0f, -1.0f }, .uv = {1.0f, 1.0f}, .color = { 0.0f, 0.0f, 1.0f, 1.0f } },
+	{ .position = { -1.0f, 0.0f, 0.0f }, .uv = {0.0f, 0.5f}, .color = { 0.0f, 0.5f, 0.5f, 1.0f } },
+	{ .position = { 0.0f, -1.0f, 0.0f }, .uv = {0.5f, 0.0f}, .color = { 0.5f, 0.0f, 0.5f, 1.0f } },
+	{ .position = { 1.0f, 0.0f, 0.0f }, .uv = {1.0f, 0.5f}, .color = { 1.0f, 0.5f, 0.5f, 1.0f } },
+	{ .position = { 0.0f, 1.0f, 0.0f }, .uv = {0.5f, 1.0f}, .color = { 0.5f, 1.0f, 0.5f, 1.0f } },
+	{ .position = { 0.0f, 0.0f, -1.0f }, .uv = {0.5f, 0.5f}, .color = { 0.5f, 0.5f, 0.0f, 1.0f } },
+	{ .position = { 0.0f, 0.0f, 1.0f }, .uv = {0.5f, 0.5f}, .color = { 0.05, 0.5f, 1.0f, 1.0f } },
 };
 static const uint8_t triangleIndices[] = {
-	0, 1, 2,
+	0, 1, 4,
+	0, 5, 1,
+	1, 2, 4,
+	1, 5, 2,
+	2, 3, 4,
+	2, 5, 3,
+	3, 0, 4,
+	3, 5, 0,
 };
 static const char *const vertexShaderSource = "#version 300 es\n"
-"in vec2 inPos;\n"
+"uniform mat4 matModel;\n"
+"uniform mat4 matModelViewProjection;\n"
+"in vec3 inPos;\n"
 "in vec2 inTexCoord;\n"
 "in vec4 inColor;\n"
 "out vec2 uv;\n"
 "out vec4 color;\n"
 "void main() {\n"
-"	gl_Position = vec4(inPos, 0.0, 1.0);\n"
+"	gl_Position = vec4(inPos, 1.0) * matModelViewProjection;\n"
 "	uv = inTexCoord;\n"
 "	color = inColor;\n"
 "}";
@@ -190,7 +232,7 @@ static const char *const fragmentShaderSource = "#version 300 es\n"
 "out vec4 outColor;\n"
 "uniform sampler2D texture0;\n"
 "void main() {\n"
-"	outColor = texture(texture0, uv);\n"
+"	outColor = texture(texture0, uv) * color;\n"
 "}";
 
 static void initDefaults(SceneRenderer_t self) {
@@ -206,7 +248,7 @@ static void initDefaults(SceneRenderer_t self) {
 	for (uint32_t i = 0; i < textureWidth * textureHeight; i++) {
 		const uint32_t x = i % textureWidth;
 		const uint32_t y = i / textureWidth;
-		textureData[i] = (((x / 8) % 2) == ((y / 8) % 2)) ? (ColorRGBA){0xFF, 0x00, 0xFF, 0xFF} : (ColorRGBA){0x00, 0x00, 0x00, 0xFF};
+		textureData[i] = (((x / 8) % 2) == ((y / 8) % 2)) ? (ColorRGBA){0xFF, 0xFF, 0xFF, 0xFF} : (ColorRGBA){0x00, 0x00, 0x00, 0xFF};
 	}
 	textureCreateFromMemoryRawInplace(defaultTexture, textureData, textureWidth, textureHeight, PIXELSIZE_4BYTES);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);

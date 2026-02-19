@@ -93,7 +93,7 @@ void coreDelete(Core_t *core) {
 void coreRun(Core_t self, App_t app) {
 	self->internal.app = app;
 	glViewport(0, 0, self->newWidth, self->newHeight);
-	coreRequestFrame(self);
+	//coreRequestFrame(self);
 	while (self->running) {
 		if (self->resize && self->readyToResize) {
 			wl_egl_window_resize(self->eglWindow, self->newWidth, self->newHeight, 0, 0);
@@ -108,6 +108,8 @@ void coreRun(Core_t self, App_t app) {
 			wl_surface_commit(self->surface);
 		}
 		wl_display_dispatch(self->display);
+		coreInternalFrame(&self->internal);
+		eglSwapBuffers(self->eglDisplay, self->eglSurface);
 	}
 }
 
@@ -288,13 +290,13 @@ static void coreInitGLContext(Core_t self) {
 	}
 	static const EGLint config_attribs[] = {
 		EGL_RENDERABLE_TYPE, EGL_OPENGL_ES3_BIT,
-		//EGL_RENDERABLE_TYPE, EGL_OPENGL_BIT,
 		EGL_SURFACE_TYPE, EGL_WINDOW_BIT,
 		EGL_RED_SIZE, 8,
 		EGL_GREEN_SIZE, 8,
 		EGL_BLUE_SIZE, 8,
 		EGL_ALPHA_SIZE, 8,
 		EGL_STENCIL_SIZE, 8,
+		EGL_DEPTH_SIZE, 24,
 		EGL_NONE
 	};
 	EGLint num = 0;
